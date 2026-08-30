@@ -1,11 +1,14 @@
 import dns from 'node:dns'
+import net from 'node:net'
 import nodemailer from 'nodemailer'
 
-// Render's network has no IPv6 egress. nodemailer's SMTP socket doesn't
-// forward a `family` option to net.connect, so the only reliable fix is
-// this process-wide DNS resolution order (Node otherwise may resolve
-// smtp.gmail.com to an IPv6 address and fail with ENETUNREACH).
+// Render's network has no IPv6 egress. `ipv4first` alone isn't enough: Node's
+// default Happy-Eyeballs dual-stack racing (autoSelectFamily) can still try
+// IPv6 in parallel and let it burn through the connection timeout before
+// falling back, causing intermittent ENETUNREACH/timeout failures. Disabling
+// autoSelectFamily forces a single-family connection based on lookup order.
 dns.setDefaultResultOrder('ipv4first')
+net.setDefaultAutoSelectFamily(false)
 
 const { GMAIL_USER, GMAIL_APP_PASSWORD } = process.env
 

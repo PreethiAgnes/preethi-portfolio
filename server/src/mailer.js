@@ -7,6 +7,10 @@ const transporter =
     ? nodemailer.createTransport({
         service: 'gmail',
         auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
+        // Render's network has no IPv6 egress; without this, Node's default
+        // happy-eyeballs resolution can pick Gmail's AAAA record and fail
+        // with ENETUNREACH instead of falling back to IPv4.
+        family: 4,
       })
     : null
 

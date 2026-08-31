@@ -16,7 +16,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
     dbConnected: mongoose.connection.readyState === 1,
-    emailConfigured: !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD),
+    emailConfigured: !!(process.env.RESEND_API_KEY && process.env.NOTIFY_EMAIL),
   })
 })
 
